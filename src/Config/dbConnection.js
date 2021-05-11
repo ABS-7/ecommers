@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 
 dotenv.config({ path: '../.env' });
 
-dbURL = process.env.dbURL || "mongodb://localhost:27017/flipcartdb";
+dbURL = process.env.dbURL;
 
 mongoose.connect(dbURL, {
     useNewUrlParser: true,
