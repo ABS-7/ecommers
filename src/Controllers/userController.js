@@ -20,16 +20,16 @@ async function register(req, res) {
                 userName: data.userName
             };
             const result = await userModel.create(validData);
-            res.send({
+            res.status(200).send({
                 name: result.name,
                 email: result.email,
                 password: result.password,
                 userType: result.userType,
                 userName: result.userName
             });
-        } else if (userNameUniqueness != 0) { res.send({ message: "user name already taken" }); }
-        else { res.send({ message: "user email already taken" }); }
-    } catch (error) { res.send({ message: error }); }
+        } else if (userNameUniqueness != 0) { res.status(422).send({ message: "user name already taken" }); }
+        else { res.status(422).send({ message: "user email already taken" }); }
+    } catch (error) { res.status(500).send({ message: error }); }
 }
 
 async function login(req, res) {
@@ -47,17 +47,17 @@ async function login(req, res) {
                 const updateResult = await userModel.updateOne(validateField, { $addToSet: { tokens: token } });
 
                 if (updateResult.nModified === 1 && updateResult.ok === 1) {
-                    res.send({
+                    res.status(200).send({
                         name: registerdUser.name,
                         email: registerdUser.email,
                         userName: registerdUser.userName,
                         userType: registerdUser.userType,
                         token: token
                     });
-                } else { res.send({ message: 'dataase error' }); }
-            } else { res.send({ message: 'incorrect password' }); }
-        } else { res.send({ message: 'user not registerd' }); }
-    } catch (error) { res.send({ message: error }); }
+                } else { res.status(500).send({ message: 'dataase error' }); }
+            } else { res.status(401).send({ message: 'incorrect password' }); }
+        } else { res.status(422).send({ message: 'user not registerd' }); }
+    } catch (error) { res.status(500).send({ message: error }); }
 }
 
 async function logout(req, res) {
@@ -68,9 +68,9 @@ async function logout(req, res) {
             { $pull: { tokens: data.token } });
         console.log(registerdUser);
         if (registerdUser.nModified === 1 && registerdUser.ok === 1) {
-            res.send({ message: 'success' });
-        } else { res.send({ message: 'database error' }); }
-    } catch (error) { res.send({ message: error }); }
+            res.status(200).send({ message: 'success' });
+        } else { res.status(500).send({ message: 'database error' }); }
+    } catch (error) { res.status(500).send({ message: error }); }
 }
 
 module.exports = {

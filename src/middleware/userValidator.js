@@ -15,12 +15,12 @@ const registartionSchema = joi.object({
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
         .required(),
     name: joi.string()
-        .pattern(new RegExp(`^[a-zA-Z]+$`))
+        //.pattern(new RegExp(`^[a-zA-Z]+$`))
         .min(3)
         .max(50)
         .required(),
     userType: joi.string()
-        .valid('Vender', 'Customer'),
+        .valid('vendor', 'customer'),
 });
 
 const loginSchema = joi.object({
@@ -52,21 +52,24 @@ const logoutSchema = joi.object({
 function registrationValidation(req, res, next) {
     const { error, value } = registartionSchema.validate(req.body);
     if (error != null) {
-        res.status(401).send({ message: error.details[0].message });
+        const tempError = error.details[0].message.replace(/[\"]/g, "");
+        res.status(422).send({ message: tempError });
     } else { next(); }
 }
 
 function loginValidation(req, res, next) {
     const { error, value } = loginSchema.validate(req.body);
     if (error != null) {
-        res.status(401).send({ message: error.details[0].message });
+        const tempError = error.details[0].message.replace(/[\"]/g, "");
+        res.status(422).send({ message: tempError });
     } else { next(); }
 }
 
 function logoutValidation(req, res, next) {
     const { error, value } = logoutSchema.validate(req.body);
     if (error != null) {
-        res.status(401).send({ message: error.details[0].message });
+        const tempError = error.details[0].message.replace(/[\"]/g, "");
+        res.status(422).send({ message: tempError });
     } else { next(); }
 }
 

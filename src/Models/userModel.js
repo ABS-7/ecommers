@@ -35,6 +35,15 @@ users.plugin(timestamp, {
     disableCreated: false, // Disables the logging of the creation date
 });
 
+//Error While Duplicate values
+users.post("save", function (error, doc, next) {
+    if (error.name === "MongoError" && error.code === 11000) {
+        next(new Error(`${Object.keys(error.keyPattern)} already exists`));
+    } else {
+        next();
+    }
+});
+
 const userModel = new mongoose.model("Users", users);
 
 module.exports = userModel;
