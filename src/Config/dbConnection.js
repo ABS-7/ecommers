@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 
 dotenv.config({ path: '../.env' });
 
-dbURL = process.env.dbURL;
+dbURL = process.env.dbURL || 'mongodb+srv://ecommerce:7iYh4EzVgyKD8Zsu@cluster0.htqd1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 
 mongoose.connect(dbURL, {
     useNewUrlParser: true,
