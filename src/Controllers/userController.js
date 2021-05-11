@@ -27,8 +27,8 @@ async function register(req, res) {
                 userType: result.userType,
                 userName: result.userName
             });
-        } else if (userNameUniqueness != 0) { res.status(422).send({ message: "user name already taken" }); }
-        else { res.status(422).send({ message: "user email already taken" }); }
+        } else if (userNameUniqueness != 0) { res.status(422).send({ message: "User name already taken" }); }
+        else { res.status(422).send({ message: "email already taken" }); }
     } catch (error) { res.status(500).send({ message: error }); }
 }
 

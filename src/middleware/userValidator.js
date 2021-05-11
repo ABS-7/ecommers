@@ -10,7 +10,10 @@ const registartionSchema = joi.object({
         .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
         //.max(20)
         .min(8)
-        .required(),
+        .required()
+        .messages({
+            'string.pattern.base': "password did not satisfay pattern"
+        }),
     email: joi.string()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
         .required(),
@@ -38,7 +41,10 @@ const loginSchema = joi.object({
         .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
         //.max(20)
         .min(8)
-        .required(),
+        .required()
+        .messages({
+            'string.pattern.base': "password did not satisfay pattern"
+        }),
 });
 
 const logoutSchema = joi.object({
