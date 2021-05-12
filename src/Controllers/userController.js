@@ -1,12 +1,13 @@
 const bcrypt = require("bcrypt");
-require("dotenv").config({ path: '../../.env' });
+require("dotenv").config({ path: '../.env' });
 const jwtToken = require("../Helpers/tokenGen");
 
 const userModel = require("../Models/userModel");
 const mailSender = require("../Helpers/mailSender");
 
-const soltRounds = process.env.SOLT_ROUNDS || 10;
-console.log(soltRounds);
+const soltRounds = +process.env.SOLT_ROUNDS || 10;
+
+console.log(typeof soltRounds);
 
 async function register(req, res) {
     const data = req.body;
@@ -68,7 +69,6 @@ async function logout(req, res) {
         const registerdUser = await userModel.updateOne(
             { email: data.email },
             { $pull: { tokens: data.token } });
-        console.log(registerdUser);
         if (registerdUser.nModified === 1 && registerdUser.ok === 1) {
             res.status(200).send({ message: 'success' });
         } else { res.status(500).send({ message: 'database error' }); }
@@ -83,7 +83,6 @@ async function forgotPassword(req, res) {
     try {
         const registerdUser = await userModel.findOne(validateField);
         if (registerdUser != null) {
-            console.log(registerdUser.email);
             const emailData = await mailSender.sendOTPMail(registerdUser.email);
 
             const addOTPResult = await userModel.updateOne({ email: registerdUser.email }, { otp: emailData.otp })
@@ -93,13 +92,13 @@ async function forgotPassword(req, res) {
                     email: registerdUser.email,
                     userName: registerdUser.userName,
                     userType: registerdUser.userType,
-                    url: emailData.url,
                     name: registerdUser.name
                 });
             } else { res.status(500).send({ message: 'database error' }); }
         } else { res.status(422).send({ message: 'user not registerd' }); }
     } catch (error) { res.status(500).send({ message: error }); }
 }
+
 async function verifyOTP(req, res) {
     const data = req.body;
     try {
@@ -122,10 +121,12 @@ async function verifyOTP(req, res) {
 
 async function resetPassword(req, res) {
     const data = req.body;
+    console.log("hello");
     try {
         const registerdUser = await userModel.findOne({ email: data.email });
         if (registerdUser != null) {
-            const passwordUpdateResult = await userModel.updateOne({ email: data.email }, { password: data.newPassword });
+            const hashPassword = await bcrypt.hash(data.newPassword, soltRounds);
+            const passwordUpdateResult = await userModel.updateOne({ email: data.email }, { password: hashPassword });
             if (passwordUpdateResult.nModified === 1 && passwordUpdateResult.ok === 1) {
                 res.status(200).send({
                     email: registerdUser.email,
@@ -135,8 +136,9 @@ async function resetPassword(req, res) {
                 });
             } else { res.status(500).send({ message: 'database error' }); }
         } else { res.status(422).send({ message: 'user not registerd' }); }
-    } catch (error) { res.status(500).send({ message: error }); }
+    } catch (error) { res.status(500).send({ message: '=>' + error }); }
 }
+
 module.exports = {
     register,
     login,

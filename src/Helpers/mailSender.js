@@ -1,4 +1,8 @@
 const nodemailer = require('nodemailer');
+require('dotenv').config({ path: '../.env' });
+
+const hostEmail = process.env.EMAIL;
+const password = process.env.PASSWORD;
 
 const otpGenerator = function (length) {
     let otp = '';
@@ -11,18 +15,17 @@ const otpGenerator = function (length) {
 const sendOTPMail = async function (email) {
 
     const transporter = nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
+        service: 'gmail',
         auth: {
-            user: 'ellis24@ethereal.email',
-            pass: '7JUxdT2DnYpzT18Y6N'
+            user: hostEmail,
+            pass: password
         }
     });
 
     const otp = otpGenerator(4);
 
     let message = {
-        from: 'Sender Name <sender@example.com>',
+        from: hostEmail,
         to: email,
         subject: 'OTP for forgot password',
         text: 'The OTP is : ' + otp,
@@ -32,7 +35,6 @@ const sendOTPMail = async function (email) {
     const emailData = await transporter.sendMail(message);
 
     return {
-        url: nodemailer.getTestMessageUrl(emailData),
         otp: otp
     };
 }

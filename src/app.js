@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const userRouter = require('./Routes/userRoutes');
 
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config();
 require('./Config/dbConnection');
 
 const app = express();
