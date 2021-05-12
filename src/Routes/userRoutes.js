@@ -11,4 +11,10 @@ router.post('/login', userValidator.loginValidation, userController.login);
 
 router.post('/logout', userValidator.logoutValidation, userController.logout);
 
+router.post('/forgotpassword', userController.forgotPassword);
+
+router.post('/otpverify', userController.verifyOTP);
+
+router.post('/resetpassword', userController.resetPassword);
+
 module.exports = router;

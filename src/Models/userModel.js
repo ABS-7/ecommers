@@ -27,7 +27,10 @@ const users = new mongoose.Schema({
     },
     tokens: [{
         type: String
-    }]
+    }],
+    otp: {
+        type: Number
+    }
 }, { collection: "Users" });
 
 

@@ -1,7 +1,9 @@
-const userModel = require("../Models/userModel");
 const bcrypt = require("bcrypt");
 require("dotenv").config({ path: '../../.env' });
 const jwtToken = require("../Helpers/tokenGen");
+
+const userModel = require("../Models/userModel");
+const mailSender = require("../Helpers/mailSender");
 
 const soltRounds = process.env.SOLT_ROUNDS || 10;
 console.log(soltRounds);
@@ -73,8 +75,73 @@ async function logout(req, res) {
     } catch (error) { res.status(500).send({ message: error }); }
 }
 
+async function forgotPassword(req, res) {
+    const data = req.body;
+    let validateField;
+    if (data.email === '') validateField = { userName: data.userName }
+    else validateField = { email: data.email }
+    try {
+        const registerdUser = await userModel.findOne(validateField);
+        if (registerdUser != null) {
+            console.log(registerdUser.email);
+            const emailData = await mailSender.sendOTPMail(registerdUser.email);
+
+            const addOTPResult = await userModel.updateOne({ email: registerdUser.email }, { otp: emailData.otp })
+
+            if (addOTPResult.nModified === 1 && addOTPResult.ok === 1) {
+                res.status(200).send({
+                    email: registerdUser.email,
+                    userName: registerdUser.userName,
+                    userType: registerdUser.userType,
+                    url: emailData.url,
+                    name: registerdUser.name
+                });
+            } else { res.status(500).send({ message: 'database error' }); }
+        } else { res.status(422).send({ message: 'user not registerd' }); }
+    } catch (error) { res.status(500).send({ message: error }); }
+}
+async function verifyOTP(req, res) {
+    const data = req.body;
+    try {
+        const registerdUser = await userModel.findOne({ email: data.email });
+        if (registerdUser != null || registerdUser.otp != null || registerdUser.otp != undefined) {
+            if (registerdUser.otp == data.otp) {
+                const removeOTPResult = await userModel.updateOne({ email: registerdUser.email }, { $unset: { otp: 1 } });
+                if (removeOTPResult.nModified === 1 && removeOTPResult.ok === 1) {
+                    res.status(200).send({
+                        email: registerdUser.email,
+                        userName: registerdUser.userName,
+                        userType: registerdUser.userType,
+                        name: registerdUser.name
+                    });
+                } else { res.status(500).send({ message: 'database error' }); }
+            } else { res.status(422).send({ message: 'invalid otp' }); }
+        } else { res.status(422).send({ message: 'user not registerd' }); }
+    } catch (error) { res.status(500).send({ message: error }); }
+}
+
+async function resetPassword(req, res) {
+    const data = req.body;
+    try {
+        const registerdUser = await userModel.findOne({ email: data.email });
+        if (registerdUser != null) {
+            const passwordUpdateResult = await userModel.updateOne({ email: data.email }, { password: data.newPassword });
+            if (passwordUpdateResult.nModified === 1 && passwordUpdateResult.ok === 1) {
+                res.status(200).send({
+                    email: registerdUser.email,
+                    userName: registerdUser.userName,
+                    userType: registerdUser.userType,
+                    name: registerdUser.name
+                });
+            } else { res.status(500).send({ message: 'database error' }); }
+        } else { res.status(422).send({ message: 'user not registerd' }); }
+    } catch (error) { res.status(500).send({ message: error }); }
+}
 module.exports = {
     register,
     login,
     logout,
+    forgotPassword,
+    verifyOTP,
+    resetPassword,
 }
