@@ -1,8 +1,9 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config({ path: '../.env' });
+//require('dotenv').config({ path: '../.env' });
 
 const hostEmail = process.env.EMAIL;
 const password = process.env.PASSWORD;
+console.log(password);
 
 const otpGenerator = function (length) {
     let otp = '';

@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-require("dotenv").config({ path: '../.env' });
+//require("dotenv").config({ path: '../.env' });
 const jwtToken = require("../Helpers/tokenGen");
 
 const userModel = require("../Models/userModel");

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+//const dotenv = require("dotenv");
 
-dotenv.config({ path: '../.env' });
+//dotenv.config({ path: '../.env' });
 
 const dbURL = process.env.dbURL || 'mongodb+srv://ecommerce:7iYh4EzVgyKD8Zsu@cluster0.htqd1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 
