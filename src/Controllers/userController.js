@@ -7,8 +7,6 @@ const mailSender = require("../Helpers/mailSender");
 
 const soltRounds = +process.env.SOLT_ROUNDS || 10;
 
-console.log(typeof soltRounds);
-
 async function register(req, res) {
     const data = req.body;
     try {
@@ -88,6 +86,12 @@ async function forgotPassword(req, res) {
             const addOTPResult = await userModel.updateOne({ email: registerdUser.email }, { otp: emailData.otp })
 
             if (addOTPResult.nModified === 1 && addOTPResult.ok === 1) {
+
+                setTimeout(async (email, model) => {
+                    await model.updateOne({ email: email }, { $unset: { otp: 1 } });
+                    console.log("task is done");
+                }, 60 * 2 * 1000, registerdUser.email, userModel);
+
                 res.status(200).send({
                     email: registerdUser.email,
                     userName: registerdUser.userName,
