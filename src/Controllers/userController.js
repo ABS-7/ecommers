@@ -21,16 +21,16 @@ async function register(req, res) {
                 userName: data.userName
             };
             const result = await userModel.create(validData);
-            res.status(200).send({
+            return res.status(200).send({
                 name: result.name,
                 email: result.email,
                 password: result.password,
                 userType: result.userType,
                 userName: result.userName
             });
-        } else if (userNameUniqueness != 0) { res.status(422).send({ message: "User name already taken" }); }
-        else { res.status(422).send({ message: "email already taken" }); }
-    } catch (error) { res.status(500).send({ message: error }); }
+        } else if (userNameUniqueness != 0) { return res.status(422).send({ message: "User name already taken" }); }
+        else { return res.status(422).send({ message: "email already taken" }); }
+    } catch (error) { return res.status(500).send({ message: error }); }
 }
 
 async function login(req, res) {
@@ -48,17 +48,17 @@ async function login(req, res) {
                 const updateResult = await userModel.updateOne(validateField, { $addToSet: { tokens: token } });
 
                 if (updateResult.nModified === 1 && updateResult.ok === 1) {
-                    res.status(200).send({
+                    return res.status(200).send({
                         name: registerdUser.name,
                         email: registerdUser.email,
                         userName: registerdUser.userName,
                         userType: registerdUser.userType,
                         token: token
                     });
-                } else { res.status(500).send({ message: 'dataase error' }); }
-            } else { res.status(401).send({ message: 'incorrect password' }); }
-        } else { res.status(422).send({ message: 'user not registerd' }); }
-    } catch (error) { res.status(500).send({ message: error }); }
+                } else { return res.status(500).send({ message: 'dataase error' }); }
+            } else { return res.status(401).send({ message: 'incorrect password' }); }
+        } else { return res.status(422).send({ message: 'user not registerd' }); }
+    } catch (error) { return res.status(500).send({ message: error }); }
 }
 
 async function logout(req, res) {
@@ -68,9 +68,9 @@ async function logout(req, res) {
             { email: data.email },
             { $pull: { tokens: data.token } });
         if (registerdUser.nModified === 1 && registerdUser.ok === 1) {
-            res.status(200).send({ message: 'success' });
-        } else { res.status(500).send({ message: 'database error' }); }
-    } catch (error) { res.status(500).send({ message: error }); }
+            return res.status(200).send({ message: 'success' });
+        } else { return res.status(500).send({ message: 'database error' }); }
+    } catch (error) { return res.status(500).send({ message: error }); }
 }
 
 async function forgotPassword(req, res) {
@@ -92,22 +92,24 @@ async function forgotPassword(req, res) {
                     console.log("task is done");
                 }, 60 * 2 * 1000, registerdUser.email, userModel);
 
-                res.status(200).send({
+                return res.status(200).send({
                     email: registerdUser.email,
                     userName: registerdUser.userName,
                     userType: registerdUser.userType,
                     name: registerdUser.name
                 });
-            } else { res.status(500).send({ message: 'database error' }); }
-        } else { res.status(422).send({ message: 'user not registerd' }); }
-    } catch (error) { res.status(500).send({ message: error }); }
+            } else { return res.status(500).send({ message: 'database error' }); }
+        } else { return res.status(422).send({ message: 'user not registerd' }); }
+    } catch (error) { return res.status(500).send({ message: error }); }
 }
 
 async function verifyOTP(req, res) {
     const data = req.body;
     try {
         const registerdUser = await userModel.findOne({ email: data.email });
-        if (registerdUser != null || registerdUser.otp != null || registerdUser.otp != undefined) {
+        if (registerdUser != null) {
+            if (registerdUser.otp === null || registerdUser.otp === undefined)
+                return res.status(422).send({ message: 'otp expire' });
             if (registerdUser.otp == data.otp) {
                 const removeOTPResult = await userModel.updateOne({ email: registerdUser.email }, { $unset: { otp: 1 } });
                 if (removeOTPResult.nModified === 1 && removeOTPResult.ok === 1) {
@@ -117,10 +119,10 @@ async function verifyOTP(req, res) {
                         userType: registerdUser.userType,
                         name: registerdUser.name
                     });
-                } else { res.status(500).send({ message: 'database error' }); }
-            } else { res.status(422).send({ message: 'invalid otp' }); }
-        } else { res.status(422).send({ message: 'user not registerd' }); }
-    } catch (error) { res.status(500).send({ message: error }); }
+                } else { return res.status(500).send({ message: 'database error' }); }
+            } else { return res.status(422).send({ message: 'invalid otp' }); }
+        } else { return res.status(422).send({ message: 'user not registerd' }); }
+    } catch (error) { return res.status(500).send({ message: error }); }
 }
 
 async function resetPassword(req, res) {
@@ -132,15 +134,15 @@ async function resetPassword(req, res) {
             const hashPassword = await bcrypt.hash(data.newPassword, soltRounds);
             const passwordUpdateResult = await userModel.updateOne({ email: data.email }, { password: hashPassword });
             if (passwordUpdateResult.nModified === 1 && passwordUpdateResult.ok === 1) {
-                res.status(200).send({
+                return res.status(200).send({
                     email: registerdUser.email,
                     userName: registerdUser.userName,
                     userType: registerdUser.userType,
                     name: registerdUser.name
                 });
-            } else { res.status(500).send({ message: 'database error' }); }
-        } else { res.status(422).send({ message: 'user not registerd' }); }
-    } catch (error) { res.status(500).send({ message: '=>' + error }); }
+            } else { return res.status(500).send({ message: 'database error' }); }
+        } else { return res.status(422).send({ message: 'user not registerd' }); }
+    } catch (error) { return res.status(500).send({ message: '=>' + error }); }
 }
 
 module.exports = {
