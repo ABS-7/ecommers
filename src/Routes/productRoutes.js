@@ -1,6 +1,6 @@
 const express = require("express");
 const productController = require("../Controllers/productController");
-const userAuth = require("../middleware/userAuth");
+const { userAuth } = require("../middleware/userAuth");
 const store = require("../Config/multer");
 
 const router = express.Router();
@@ -8,12 +8,11 @@ const router = express.Router();
 const urlencoder = express.urlencoded({ extended: true });
 
 router.get('/',
-    userAuth.vendorAuth,
+    userAuth,
     productController.show);
 
 router.post("/add",
-    urlencoder,
-    userAuth.vendorAuth,
+    userAuth,
     store.ProductStore.single("productImg"),
     productController.add);
 

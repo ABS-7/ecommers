@@ -1,7 +1,7 @@
 const express = require("express");
 const userController = require("../Controllers/userController");
 const userValidator = require("../middleware/userValidator");
-
+const { userAuth } = require('../middleware/userAuth');
 const router = express.Router();
 //const urlencoder = express.urlencoded({ extended: true });
 
@@ -9,7 +9,7 @@ router.post('/register', userValidator.registrationValidation, userController.re
 
 router.post('/login', userValidator.loginValidation, userController.login);
 
-router.post('/logout', userValidator.logoutValidation, userController.logout);
+router.post('/logout', userAuth, userController.logout);
 
 router.post('/forgotpassword', userController.forgotPassword);
 

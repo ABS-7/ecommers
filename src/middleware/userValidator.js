@@ -47,14 +47,6 @@ const loginSchema = joi.object({
         }),
 });
 
-const logoutSchema = joi.object({
-    email: joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
-        .required(),
-    token: joi.string()
-        .regex(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*$/)
-});
-
 function registrationValidation(req, res, next) {
     const { error, value } = registartionSchema.validate(req.body);
     if (error != null) {
@@ -82,5 +74,4 @@ function logoutValidation(req, res, next) {
 module.exports = {
     registrationValidation,
     loginValidation,
-    logoutValidation,
 }

@@ -62,11 +62,11 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
-    const data = req.body;
+    const token = req.headers.token.split(' ')[1];
     try {
         const registerdUser = await userModel.updateOne(
-            { email: data.email },
-            { $pull: { tokens: data.token } });
+            { email: req.user.email },
+            { $pull: { tokens: token } });
         if (registerdUser.nModified === 1 && registerdUser.ok === 1) {
             return res.status(200).send({ message: 'success' });
         } else { return res.status(500).send({ message: 'database error' }); }

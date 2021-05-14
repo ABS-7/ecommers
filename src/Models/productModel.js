@@ -3,7 +3,7 @@ const timestamp = require('mongoose-timestamp');
 
 const products = new mongoose.Schema({
 
-    productsName: {
+    productName: {
         type: String,
         required: true,
     },

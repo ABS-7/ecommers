@@ -1,15 +1,24 @@
+const productModel = require('../Models/productModel');
+
 async function show(req, res) {
     console.log("in product controller");
     return res.send("in product controller");
 }
 
 async function add(req, res) {
-    // console.log(req.body);
-    // console.log(req.file);
-    // try{
-    //     const add
-    // }
-    // res.send("in product controller");
+    const data = req.body;
+    try {
+        const addProductResult = await productModel.create({
+            productName: data.productName,
+            productPrice: data.productPrice,
+            productStock: data.productStock,
+            addedBy: req.user._id,
+            img: { productImgPath: req.file.path }
+        });
+        if (addProductResult._id != undefined) {
+            return res.status(200).json({ message: 'success' });
+        } else { return res.status(500).json({ message: 'dataase error' }); }
+    } catch (error) { return res.status(500).json({ message: error }); }
 }
 
 module.exports = {
