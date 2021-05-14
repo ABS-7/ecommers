@@ -8,7 +8,7 @@ function randomKey() {
 }
 
 function generateToken(email, userType, name) {
-    const jwtKey = randomKey();
+    const jwtKey = process.env.JWT_KEY;
     let payload = {
         email: email,
         userType: userType,

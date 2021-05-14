@@ -1,7 +1,5 @@
 const bcrypt = require("bcrypt");
-//require("dotenv").config({ path: '../.env' });
 const jwtToken = require("../Helpers/tokenGen");
-
 const userModel = require("../Models/userModel");
 const mailSender = require("../Helpers/mailSender");
 
@@ -49,10 +47,12 @@ async function login(req, res) {
 
                 if (updateResult.nModified === 1 && updateResult.ok === 1) {
                     return res.status(200).send({
-                        name: registerdUser.name,
-                        email: registerdUser.email,
-                        userName: registerdUser.userName,
-                        userType: registerdUser.userType,
+                        user: {
+                            name: registerdUser.name,
+                            email: registerdUser.email,
+                            userName: registerdUser.userName,
+                            userType: registerdUser.userType,
+                        },
                         token: token
                     });
                 } else { return res.status(500).send({ message: 'dataase error' }); }
