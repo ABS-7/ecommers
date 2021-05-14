@@ -62,7 +62,7 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
-    const token = req.headers.token.split(' ')[1];
+    const token = req.header("Authorization").replace("Bearer ", "");;
     try {
         const registerdUser = await userModel.updateOne(
             { email: req.user.email },
