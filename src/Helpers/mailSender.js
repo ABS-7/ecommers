@@ -2,7 +2,6 @@ const nodemailer = require('nodemailer');
 
 const hostEmail = process.env.EMAIL;
 const password = process.env.PASSWORD;
-console.log(password);
 
 const otpGenerator = function (length) {
     let otp = '';
