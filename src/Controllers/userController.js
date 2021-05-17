@@ -12,6 +12,7 @@ async function register(req, res) {
         const emailUniqueness = await userModel.find({ email: data.email }).countDocuments();
         if (userNameUniqueness === 0 && emailUniqueness === 0) {
             const token = jwtToken.generateToken(data.email, data.userType, data.name);
+
             const validData = {
                 name: data.name,
                 email: data.email,
@@ -21,13 +22,17 @@ async function register(req, res) {
                 tokens: [token]
             };
             const result = await userModel.create(validData);
+
+            await mailSender.sendVerificationMail(data.email, result._id);
+
             return res.status(200).send({
                 user: {
                     name: result.name,
                     email: result.email,
                     password: result.password,
                     userType: result.userType,
-                    userName: result.userName
+                    userName: result.userName,
+                    verified: registerdUser.verified,
                 },
                 token: token
             });
@@ -57,6 +62,7 @@ async function login(req, res) {
                             email: registerdUser.email,
                             userName: registerdUser.userName,
                             userType: registerdUser.userType,
+                            verified: registerdUser.verified,
                         },
                         token: token
                     });
@@ -100,7 +106,8 @@ async function forgotPassword(req, res) {
                     email: registerdUser.email,
                     userName: registerdUser.userName,
                     userType: registerdUser.userType,
-                    name: registerdUser.name
+                    name: registerdUser.name,
+                    verified: registerdUser.verified,
                 });
             } else { return res.status(500).send({ message: 'database error' }); }
         } else { return res.status(422).send({ message: 'user not registerd' }); }
@@ -121,7 +128,8 @@ async function verifyOTP(req, res) {
                         email: registerdUser.email,
                         userName: registerdUser.userName,
                         userType: registerdUser.userType,
-                        name: registerdUser.name
+                        name: registerdUser.name,
+                        verified: registerdUser.verified,
                     });
                 } else { return res.status(500).send({ message: 'database error' }); }
             } else { return res.status(422).send({ message: 'invalid otp' }); }
@@ -142,11 +150,21 @@ async function resetPassword(req, res) {
                     email: registerdUser.email,
                     userName: registerdUser.userName,
                     userType: registerdUser.userType,
-                    name: registerdUser.name
+                    name: registerdUser.name,
+                    verified: registerdUser.verified,
                 });
             } else { return res.status(500).send({ message: 'database error' }); }
         } else { return res.status(422).send({ message: 'user not registerd' }); }
     } catch (error) { return res.status(500).send({ message: '=>' + error }); }
+}
+
+async function userVerifier(req, res) {
+    try {
+        const rverifiedUser = await userModel.updateOne({ _id: req.body.id }, { verified: true });
+        if (rverifiedUser.nModified === 1 && rverifiedUser.ok === 1) {
+            res.status(200).json({ message: "success" });
+        } else { return res.status(422).send({ message: 'user not registerd' }); }
+    } catch (error) { return res.status(500).send({ message: error }); }
 }
 
 module.exports = {
@@ -156,4 +174,5 @@ module.exports = {
     forgotPassword,
     verifyOTP,
     resetPassword,
+    userVerifier,
 }

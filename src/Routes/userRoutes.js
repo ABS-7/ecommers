@@ -17,4 +17,6 @@ router.post('/otpverify', userController.verifyOTP);
 
 router.post('/resetpassword', userController.resetPassword);
 
+router.post('/verifyuser', userController.userVerifier);
+
 module.exports = router;

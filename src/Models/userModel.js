@@ -30,6 +30,11 @@ const users = new mongoose.Schema({
     }],
     otp: {
         type: Number,
+    },
+    verified: {
+        type: Boolean,
+        default: false,
+        required: true
     }
 }, { collection: "Users" });
 
