@@ -1,14 +1,19 @@
 const productModel = require('../Models/productModel');
 
 async function show(req, res) {
-    console.log(req.user);
     try {
         const userProducts = await productModel.find({ addedBy: req.user._id });
-
-        console.log(userProducts);
+        return res.status(200).json({
+            user: {
+                name: req.user.name,
+                userType: req.user.userType,
+                userName: req.user.userName,
+                verified: req.user.verified,
+                email: req.user.email
+            },
+            products: userProducts
+        });
     } catch (error) { return res.status(500).json({ message: error }); }
-
-    return res.send("in product controller");
 }
 
 async function add(req, res) {
