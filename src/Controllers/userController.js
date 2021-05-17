@@ -2,6 +2,8 @@ const bcrypt = require("bcrypt");
 const jwtToken = require("../Helpers/tokenGen");
 const userModel = require("../Models/userModel");
 const mailSender = require("../Helpers/mailSender");
+const productModel = require("../Models/productModel");
+
 
 const soltRounds = +process.env.SOLT_ROUNDS || 10;
 
@@ -169,6 +171,22 @@ async function userVerifier(req, res) {
     } catch (error) { return res.status(500).send({ message: error }); }
 }
 
+async function getvendor(req, res) {
+    try {
+        const userProducts = await productModel.find({ addedBy: req.user._id });
+        return res.status(200).json({
+            user: {
+                name: req.user.name,
+                userType: req.user.userType,
+                userName: req.user.userName,
+                verified: req.user.verified,
+                email: req.user.email
+            },
+            products: userProducts
+        });
+    } catch (error) { return res.status(500).json({ message: error }); }
+}
+
 module.exports = {
     register,
     login,
@@ -177,4 +195,5 @@ module.exports = {
     verifyOTP,
     resetPassword,
     userVerifier,
+    getvendor
 }

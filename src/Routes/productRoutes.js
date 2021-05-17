@@ -7,11 +7,6 @@ const router = express.Router();
 
 const urlencoder = express.urlencoded({ extended: true });
 
-router.get('/getvendor',
-    userAuth,
-    vendorOnly,
-    productController.show);
-
 router.post("/add",
     userAuth,
     vendorOnly,
