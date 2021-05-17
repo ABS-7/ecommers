@@ -32,7 +32,7 @@ async function register(req, res) {
                     password: result.password,
                     userType: result.userType,
                     userName: result.userName,
-                    verified: registerdUser.verified,
+                    verified: result.verified,
                 },
                 token: token
             });
@@ -160,8 +160,8 @@ async function resetPassword(req, res) {
 
 async function userVerifier(req, res) {
     try {
-        const rverifiedUser = await userModel.updateOne({ _id: req.body.id }, { verified: true });
-        if (rverifiedUser.nModified === 1 && rverifiedUser.ok === 1) {
+        const verifiedUser = await userModel.updateOne({ _id: req.body.id }, { verified: true });
+        if (verifiedUser.nModified === 1 && verifiedUser.ok === 1) {
             res.status(200).json({ message: "success" });
         } else { return res.status(422).send({ message: 'user not registerd' }); }
     } catch (error) { return res.status(500).send({ message: error }); }
