@@ -9,7 +9,7 @@ router.post('/register', userValidator.registrationValidation, userController.re
 
 router.post('/login', userValidator.loginValidation, userController.login);
 
-router.post('/logout', userAuth, userController.logout);
+router.get('/logout', userAuth, userController.logout);
 
 router.post('/forgotpassword', userController.forgotPassword);
 

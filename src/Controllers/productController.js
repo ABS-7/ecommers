@@ -3,7 +3,8 @@ const productModel = require('../Models/productModel');
 async function show(req, res) {
     console.log(req.user);
     try {
-        const userProducts = productModel.find({ addedBy: req.user._id });
+        const userProducts = await productModel.find({ addedBy: req.user._id });
+
         console.log(userProducts);
     } catch (error) { return res.status(500).json({ message: error }); }
 
