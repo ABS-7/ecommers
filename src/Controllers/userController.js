@@ -161,9 +161,11 @@ async function resetPassword(req, res) {
 async function userVerifier(req, res) {
     try {
         const verifiedUser = await userModel.updateOne({ _id: req.body.id }, { verified: true });
+        console.log(verifiedUser);
         if (verifiedUser.nModified === 1 && verifiedUser.ok === 1) {
             res.status(200).json({ message: "success" });
-        } else { return res.status(422).send({ message: 'user not registerd' }); }
+        } else if (verifiedUser.nModified === 0 && verifiedUser.n === 1 && verifiedUser.ok === 1) { return res.status(409).json({ message: 'user already verified' }); }
+        else { return res.status(422).send({ message: 'user not registerd' }); }
     } catch (error) { return res.status(500).send({ message: error }); }
 }
 
