@@ -11,20 +11,25 @@ async function register(req, res) {
         const userNameUniqueness = await userModel.find({ userName: data.userName }).countDocuments();
         const emailUniqueness = await userModel.find({ email: data.email }).countDocuments();
         if (userNameUniqueness === 0 && emailUniqueness === 0) {
+            const token = jwtToken.generateToken(data.email, data.userType, data.name);
             const validData = {
                 name: data.name,
                 email: data.email,
                 password: await bcrypt.hash(data.password, soltRounds),
                 userType: data.userType,
-                userName: data.userName
+                userName: data.userName,
+                tokens: [token]
             };
             const result = await userModel.create(validData);
             return res.status(200).send({
-                name: result.name,
-                email: result.email,
-                password: result.password,
-                userType: result.userType,
-                userName: result.userName
+                user: {
+                    name: result.name,
+                    email: result.email,
+                    password: result.password,
+                    userType: result.userType,
+                    userName: result.userName
+                },
+                token: token
             });
         } else if (userNameUniqueness != 0) { return res.status(422).send({ message: "User name already taken" }); }
         else { return res.status(422).send({ message: "email already taken" }); }
