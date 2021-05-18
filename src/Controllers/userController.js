@@ -68,7 +68,7 @@ async function login(req, res) {
                         },
                         token: token
                     });
-                } else { return res.status(500).send({ message: 'dataase error' }); }
+                } else { return res.status(500).send({ message: 'database error' }); }
             } else { return res.status(401).send({ message: 'incorrect password' }); }
         } else { return res.status(422).send({ message: 'user not registerd' }); }
     } catch (error) { return res.status(500).send({ message: error }); }

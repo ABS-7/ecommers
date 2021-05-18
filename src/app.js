@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const userRouter = require('./Routes/userRoutes');
 const productRouter = require('./Routes/productRoutes');
+const authRouter = require('./Routes/socialMediaAuthRoutes');
 
 require('./Config/dbConnection');
 

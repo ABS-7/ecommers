@@ -3,7 +3,10 @@ const userController = require("../Controllers/userController");
 const userValidator = require("../middleware/userValidator");
 const { userAuth, vendorOnly } = require("../middleware/userAuth");
 const router = express.Router();
+const authRouter = require('./socialMediaAuthRoutes');
 //const urlencoder = express.urlencoded({ extended: true });
+
+router.use('/auth', authRouter);
 
 router.post('/register', userValidator.registrationValidation, userController.register);
 
