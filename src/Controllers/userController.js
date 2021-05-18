@@ -180,9 +180,9 @@ async function getvendor(req, res) {
                 userType: req.user.userType,
                 userName: req.user.userName,
                 verified: req.user.verified,
-                email: req.user.email
+                email: req.user.email,
+                products: userProducts
             },
-            products: userProducts
         });
     } catch (error) { return res.status(500).json({ message: error }); }
 }
