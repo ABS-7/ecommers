@@ -1,5 +1,6 @@
 const userModel = require('../Models/userModel');
 const jwtToken = require('../Helpers/tokenGen');
+const { OAuth2Client } = require('google-auth-library')
 
 async function isRegistered(req, res) {
     try {
@@ -23,6 +24,45 @@ async function isRegistered(req, res) {
     } catch (error) { return res.status(500).json({ message: error }); }
 }
 
+async function googleAuth(req, res) {
+    const data = req.body;
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const { token } = data
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID
+    });
+    const { email, name } = ticket.getPayload();
+    try {
+        const token = jwtToken.generateToken(email, data.userType, name);
+        const validData = {
+            name: name,
+            email: email,
+            userType: data.userType,
+            tokens: [token],
+            verified: true,
+            socialLogin: {
+                isSocialLogin: true,
+                dataAndID: [{
+                    platform: data.platform,
+                    ID: data.id
+                }]
+            },
+        };
+
+        const result = await userModel.create(validData);
+
+        return res.status(200).send({
+            user: {
+                name: result.name,
+                email: result.email,
+                userType: result.userType,
+            },
+            token: token
+        });
+    } catch (error) { return res.status(500).send({ message: error }); }
+}
 module.exports = {
     isRegistered,
+    googleAuth,
 }
