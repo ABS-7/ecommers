@@ -26,4 +26,6 @@ router.get('/getvendor', userAuth, vendorOnly, userController.getvendor);
 
 router.post('/editprofile', userAuth, userController.editProfile);
 
+router.post('/editpassword', userAuth, userController.editPassword);
+
 module.exports = router;

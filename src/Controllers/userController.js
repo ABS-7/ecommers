@@ -240,6 +240,19 @@ async function editProfile(req, res) {
     } catch (error) { return res.status(500).json({ message: error }); }
 }
 
+async function editPassword(req, res) {
+    const data = req.body;
+    try {
+        const passwordMatch = bcrypt.compareSync(data.currentPassword, req.user.password);
+        if (passwordMatch) {
+            const updatedUserResult = await userModel.updateOne({ _id: req.user._id },
+                { password: await bcrypt.hash(data.newPassword, soltRounds) });
+            console.log(updatedUserResult);
+            if (updatedUserResult.ok === 1) { return res.status(200).json({ message: 'success' }); }
+            else { return res.status(500).json({ message: 'database error' }); }
+        } else { return res.status(401).json({ message: "current password is incorrect" }); }
+    } catch (error) { return res.status(500).json({ message: error }); }
+}
 module.exports = {
     register,
     login,
@@ -249,5 +262,6 @@ module.exports = {
     resetPassword,
     userVerifier,
     getvendor,
-    editProfile
+    editProfile,
+    editPassword,
 }
