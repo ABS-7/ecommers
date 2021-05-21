@@ -21,7 +21,7 @@ async function register(req, res) {
                 password: await bcrypt.hash(data.password, soltRounds),
                 userType: data.userType,
                 userName: data.userName,
-                tokens: [token]
+                tokens: [token],
             };
             const result = await userModel.create(validData);
 
@@ -31,10 +31,11 @@ async function register(req, res) {
                 user: {
                     name: result.name,
                     email: result.email,
-                    password: result.password,
+                    //password: result.password,
                     userType: result.userType,
                     userName: result.userName,
                     verified: result.verified,
+                    isSocialLogin: result.socialLogin.isSocialLogin,
                 },
                 token: token
             });
@@ -65,6 +66,7 @@ async function login(req, res) {
                             userName: registerdUser.userName,
                             userType: registerdUser.userType,
                             verified: registerdUser.verified,
+                            isSocialLogin: registerdUser.socialLogin.isSocialLogin,
                         },
                         token: token
                     });
@@ -155,9 +157,9 @@ async function resetPassword(req, res) {
                     name: registerdUser.name,
                     verified: registerdUser.verified,
                 });
-            } else { return res.status(500).send({ message: 'database error' }); }
-        } else { return res.status(422).send({ message: 'user not registerd' }); }
-    } catch (error) { return res.status(500).send({ message: '=>' + error }); }
+            } else { return res.status(500).json({ message: 'database error' }); }
+        } else { return res.status(422).json({ message: 'user not registerd' }); }
+    } catch (error) { return res.status(500).json({ message: '=>' + error }); }
 }
 
 async function userVerifier(req, res) {
@@ -181,9 +183,62 @@ async function getvendor(req, res) {
                 userName: req.user.userName,
                 verified: req.user.verified,
                 email: req.user.email,
-                products: userProducts
+                products: userProducts,
+                isSocialLogin: req.user.socialLogin.isSocialLogin,
             },
         });
+    } catch (error) { return res.status(500).json({ message: error }); }
+}
+
+async function editProfile(req, res) {
+    if (req.user.socialLogin.isSocialLogin === true)
+        return res.status(401).json({ message: 'user login threw social media, can not able to serve' });
+    const data = req.body;
+    try {
+        const userNameUniqueness = await userModel.find({
+            $and: [{ userName: data.userName }, { _id: { $ne: req.user._id } }]
+        }).countDocuments();
+        const emailUniqueness = await userModel.find({
+            $and: [{ email: data.email }, { _id: { $ne: req.user._id } }]
+        }).countDocuments();
+
+        if (userNameUniqueness === 0 && emailUniqueness === 0) {
+            const newToken = jwtToken.generateToken(data.email, req.user.userType, data.name);
+
+            let newData;
+            if (req.user.email !== data.email) {
+                newData = {
+                    email: data.email,
+                    name: data.name,
+                    userName: data.userName,
+                    tokens: [newToken],
+                    verified: false
+                };
+            } else {
+                newData = {
+                    name: data.name,
+                    userName: data.userName,
+                    tokens: [newToken],
+                };
+            }
+
+            const updatedUserResult = await userModel.updateOne({ _id: req.user._id }, newData);
+
+            if (req.user.email !== data.email)
+                await mailSender.sendVerificationMail(data.email, req.user._id);
+
+            return res.status(200).json({
+                user: {
+                    name: data.name,
+                    email: data.email,
+                    userType: req.user.userType,
+                    userName: data.userName,
+                    verified: req.user.verified,
+                    isSocialLogin: req.user.socialLogin.isSocialLogin,
+                },
+                token: newToken
+            });
+        } else if (userNameUniqueness != 0) { return res.status(422).json({ message: "User name already taken" }); } else { return res.status(422).json({ message: "email already taken" }); }
     } catch (error) { return res.status(500).json({ message: error }); }
 }
 
@@ -195,5 +250,6 @@ module.exports = {
     verifyOTP,
     resetPassword,
     userVerifier,
-    getvendor
+    getvendor,
+    editProfile
 }

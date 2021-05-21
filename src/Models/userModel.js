@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const timestamp = require('mongoose-timestamp');
 
 const users = new mongoose.Schema({
-
+    // normal fields
     name: {
         type: String,
         required: true,
@@ -24,6 +24,8 @@ const users = new mongoose.Schema({
         type: String,
         required: true,
     },
+
+    // server side fields
     tokens: [{
         type: String
     }],
@@ -36,7 +38,10 @@ const users = new mongoose.Schema({
         required: true
     },
     socialLogin: {
-        isSocialLogin: Boolean,
+        isSocialLogin: {
+            type: Boolean,
+            default: false
+        },
         dataAndID: [{
             platform: String,
             ID: String
