@@ -191,8 +191,6 @@ async function getvendor(req, res) {
 }
 
 async function editProfile(req, res) {
-    if (req.user.socialLogin.isSocialLogin === true)
-        return res.status(401).json({ message: 'user login threw social media, can not able to serve' });
     const data = req.body;
     try {
         const userNameUniqueness = await userModel.find({
