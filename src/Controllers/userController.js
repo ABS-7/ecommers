@@ -287,6 +287,7 @@ async function getvendor(req, res) {
                 email: req.user.email,
                 products: userProducts,
                 isSocialLogin: req.user.socialLogin.isSocialLogin,
+                profileImg: req.user.profileImg,
             },
         });
     } catch (error) { return res.status(500).json({ message: error }); }
