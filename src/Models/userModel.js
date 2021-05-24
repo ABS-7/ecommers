@@ -47,7 +47,9 @@ const users = new mongoose.Schema({
             ID: String
         }]
     },
-
+    userImgPath: {
+        type: String
+    }
 }, { collection: "Users" });
 
 

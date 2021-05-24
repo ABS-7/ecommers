@@ -243,6 +243,15 @@ async function editPassword(req, res) {
         } else { return res.status(401).json({ message: "current password is incorrect" }); }
     } catch (error) { return res.status(500).json({ message: error }); }
 }
+async function setUserImg(req, res) {
+    try {
+        const updatedUserResult = await userModel.updateOne({ _id: req.user._id }, { userImgPath: req.file.path });
+        if (updatedUserResult.ok === 1 && updatedUserResult.nModified === 1) {
+            return res.status(200).json({ message: 'success' });
+        } else { return res.status(500).json({ message: 'database error' }); }
+    } catch (error) { return res.status(500).json({ message: error }); }
+}
+
 
 
 async function getvendor(req, res) {
@@ -274,4 +283,5 @@ module.exports = {
     editProfile,
     editPassword,
     resendUserVerificationEmail,
+    setUserImg,
 }
