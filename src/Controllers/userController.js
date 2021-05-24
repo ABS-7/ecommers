@@ -7,6 +7,7 @@ const productModel = require("../Models/productModel");
 
 const soltRounds = +process.env.SOLT_ROUNDS || 10;
 
+// sign in, up, logout
 async function register(req, res) {
     const data = req.body;
     try {
@@ -14,7 +15,6 @@ async function register(req, res) {
         const emailUniqueness = await userModel.find({ email: data.email }).countDocuments();
         if (userNameUniqueness === 0 && emailUniqueness === 0) {
             const token = jwtToken.generateToken(data.email, data.userType, data.name);
-
             const validData = {
                 name: data.name,
                 email: data.email,
@@ -43,7 +43,6 @@ async function register(req, res) {
         else { return res.status(422).send({ message: "email already taken" }); }
     } catch (error) { return res.status(500).send({ message: error }); }
 }
-
 async function login(req, res) {
     const data = req.body;
     let validateField;
@@ -75,7 +74,6 @@ async function login(req, res) {
         } else { return res.status(422).send({ message: 'user not registerd' }); }
     } catch (error) { return res.status(500).send({ message: error }); }
 }
-
 async function logout(req, res) {
     try {
         const registerdUser = await userModel.updateOne(
@@ -87,6 +85,8 @@ async function logout(req, res) {
     } catch (error) { return res.status(500).send({ message: error }); }
 }
 
+
+// forgot password
 async function forgotPassword(req, res) {
     const data = req.body;
     let validateField;
@@ -117,7 +117,6 @@ async function forgotPassword(req, res) {
         } else { return res.status(422).send({ message: 'user not registerd' }); }
     } catch (error) { return res.status(500).send({ message: error }); }
 }
-
 async function verifyOTP(req, res) {
     const data = req.body;
     try {
@@ -140,7 +139,6 @@ async function verifyOTP(req, res) {
         } else { return res.status(422).send({ message: 'user not registerd' }); }
     } catch (error) { return res.status(500).send({ message: error }); }
 }
-
 async function resetPassword(req, res) {
     const data = req.body;
     console.log("hello");
@@ -162,34 +160,27 @@ async function resetPassword(req, res) {
     } catch (error) { return res.status(500).json({ message: '=>' + error }); }
 }
 
+
+// user verification
 async function userVerifier(req, res) {
     try {
         const verifiedUser = await userModel.updateOne({ _id: req.body.id }, { verified: true });
-        console.log(verifiedUser);
         if (verifiedUser.nModified === 1 && verifiedUser.ok === 1) {
             res.status(200).json({ message: "success" });
         } else if (verifiedUser.nModified === 0 && verifiedUser.n === 1 && verifiedUser.ok === 1) { return res.status(409).json({ message: 'user already verified' }); }
         else { return res.status(422).send({ message: 'user not registerd' }); }
     } catch (error) { return res.status(500).send({ message: error }); }
 }
-
-async function getvendor(req, res) {
+async function resendUserVerificationEmail(req, res) {
     try {
-        const userProducts = await productModel.find({ addedBy: req.user._id });
-        return res.status(200).json({
-            user: {
-                name: req.user.name,
-                userType: req.user.userType,
-                userName: req.user.userName,
-                verified: req.user.verified,
-                email: req.user.email,
-                products: userProducts,
-                isSocialLogin: req.user.socialLogin.isSocialLogin,
-            },
-        });
-    } catch (error) { return res.status(500).json({ message: error }); }
+        await mailSender.sendVerificationMail(req.user.email, req.user._id);
+        console.log(req.user.email, req.user._id);
+        res.status(200).json({ message: 'success' });
+    } catch (error) { return res.status(500).send({ message: error }); }
 }
 
+
+// update profile
 async function editProfile(req, res) {
     const data = req.body;
     try {
@@ -239,7 +230,6 @@ async function editProfile(req, res) {
         } else if (userNameUniqueness != 0) { return res.status(422).json({ message: "User name already taken" }); } else { return res.status(422).json({ message: "email already taken" }); }
     } catch (error) { return res.status(500).json({ message: error }); }
 }
-
 async function editPassword(req, res) {
     const data = req.body;
     try {
@@ -253,6 +243,25 @@ async function editPassword(req, res) {
         } else { return res.status(401).json({ message: "current password is incorrect" }); }
     } catch (error) { return res.status(500).json({ message: error }); }
 }
+
+
+async function getvendor(req, res) {
+    try {
+        const userProducts = await productModel.find({ addedBy: req.user._id });
+        return res.status(200).json({
+            user: {
+                name: req.user.name,
+                userType: req.user.userType,
+                userName: req.user.userName,
+                verified: req.user.verified,
+                email: req.user.email,
+                products: userProducts,
+                isSocialLogin: req.user.socialLogin.isSocialLogin,
+            },
+        });
+    } catch (error) { return res.status(500).json({ message: error }); }
+}
+
 module.exports = {
     register,
     login,
@@ -264,4 +273,5 @@ module.exports = {
     getvendor,
     editProfile,
     editPassword,
+    resendUserVerificationEmail,
 }
