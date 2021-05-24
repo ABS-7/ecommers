@@ -69,6 +69,7 @@ async function login(req, res) {
                             userType: registerdUser.userType,
                             verified: registerdUser.verified,
                             isSocialLogin: registerdUser.socialLogin.isSocialLogin,
+                            profileImg: registerdUser.profileImg,
                         },
                         token: token
                     });
@@ -227,6 +228,7 @@ async function editProfile(req, res) {
                     userName: data.userName,
                     verified: req.user.verified,
                     isSocialLogin: req.user.socialLogin.isSocialLogin,
+                    profileImg: req.user.profileImg,
                 },
                 token: newToken
             });
