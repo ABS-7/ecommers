@@ -19,10 +19,10 @@ const products = new mongoose.Schema({
             message: '{VALUE} is not an integer value'
         }
     },
-    img: {
-        productImgPath: {
+    imgs: {
+        productImgsPath: [{
             type: String,
-        }
+        }]
     },
     addedBy: {
         type: mongoose.Schema.Types.ObjectId,

@@ -7,6 +7,7 @@ const productModel = require("../Models/productModel");
 
 const soltRounds = +process.env.SOLT_ROUNDS || 10;
 
+
 // sign in, up, logout
 async function register(req, res) {
     const data = req.body;
@@ -253,7 +254,7 @@ async function setUserImg(req, res) {
 }
 
 
-
+// fetch user
 async function getvendor(req, res) {
     try {
         const userProducts = await productModel.find({ addedBy: req.user._id });

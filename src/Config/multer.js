@@ -5,10 +5,9 @@ const storageProduct = multer.diskStorage({
         cb(null, './public/productImgs/');
     },
     filename: function (req, file, cb) {
-        const ex = file.originalname.substr(file.originalname.lastIndexOf('.'));
         const date = Date.now();
         req.body.datestemp = date;
-        cb(null, req.body.productName + '-' + date + ex);
+        cb(null, req.body.productName + '-' + date + '-' + file.originalname);
     }
 });
 
