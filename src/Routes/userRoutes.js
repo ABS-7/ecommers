@@ -36,6 +36,7 @@ router.post('/verifyuser', userController.userVerifier);
 router.get('/resendverificationemail', userAuth, userController.resendUserVerificationEmail);
 
 
+//get users and products of user
 router.get('/getvendor', userAuth, vendorOnly, userController.getvendor);
 
 module.exports = router;

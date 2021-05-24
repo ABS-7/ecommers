@@ -5,8 +5,6 @@ const { ProductStore } = require("../Config/multer");
 
 const router = express.Router();
 
-const urlencoder = express.urlencoded({ extended: true });
-
 const productImgLimit = process.env.PRODUCT_IMG_LIMIT;
 
 router.post("/add",
@@ -14,7 +12,6 @@ router.post("/add",
     vendorOnly,
     ProductStore.array("productImg", productImgLimit),
     productController.add);
-
 
 
 module.exports = router;
