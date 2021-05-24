@@ -1,11 +1,13 @@
+const path = require('path');
 const productModel = require('../Models/productModel');
 
 async function add(req, res) {
     const data = req.body;
     const files = req.files;
+    const cwd = process.cwd();
     let imgsPath = [];
     for (let img = 0; img < files.length; img++) {
-        imgsPath.push(files[img].path);
+        imgsPath.push(path.join(cwd, files[img].path));
     }
     try {
         const addProductResult = await productModel.create({

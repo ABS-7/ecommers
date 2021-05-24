@@ -1,8 +1,10 @@
 const bcrypt = require("bcrypt");
+const path = require('path');
 const jwtToken = require("../Helpers/tokenGen");
 const userModel = require("../Models/userModel");
 const mailSender = require("../Helpers/mailSender");
 const productModel = require("../Models/productModel");
+const { cwd } = require("process");
 
 
 const soltRounds = +process.env.SOLT_ROUNDS || 10;
@@ -246,7 +248,8 @@ async function editPassword(req, res) {
 }
 async function setUserImg(req, res) {
     try {
-        const updatedUserResult = await userModel.updateOne({ _id: req.user._id }, { userImgPath: req.file.path });
+        const fullPath = path.join(process.cwd(), req.file.path);
+        const updatedUserResult = await userModel.updateOne({ _id: req.user._id }, { profileImg: fullPath });
         if (updatedUserResult.ok === 1 && updatedUserResult.nModified === 1) {
             return res.status(200).json({ message: 'success' });
         } else { return res.status(500).json({ message: 'database error' }); }
