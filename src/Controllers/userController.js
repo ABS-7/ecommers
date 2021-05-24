@@ -248,10 +248,27 @@ async function editPassword(req, res) {
 }
 async function setUserImg(req, res) {
     try {
+        let userProducts;
         const fullPath = path.join(process.cwd(), req.file.path);
         const updatedUserResult = await userModel.updateOne({ _id: req.user._id }, { profileImg: fullPath });
+
         if (updatedUserResult.ok === 1 && updatedUserResult.nModified === 1) {
-            return res.status(200).json({ message: 'success' });
+            if (req.user.userType === 'vendor') {
+                userProducts = await productModel.find({ addedBy: req.user._id });
+                console.log(userProducts);
+            } else { userProducts = []; }
+            return res.status(200).json({
+                user: {
+                    name: req.user.name,
+                    email: req.user.email,
+                    userType: req.user.userType,
+                    userName: req.user.userName,
+                    verified: req.user.verified,
+                    isSocialLogin: req.user.socialLogin.isSocialLogin,
+                    profileImg: fullPath,
+                    products: userProducts
+                }
+            });
         } else { return res.status(500).json({ message: 'database error' }); }
     } catch (error) { return res.status(500).json({ message: error }); }
 }
