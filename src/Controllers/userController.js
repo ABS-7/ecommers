@@ -39,6 +39,7 @@ async function register(req, res) {
                     userName: result.userName,
                     verified: result.verified,
                     isSocialLogin: result.socialLogin.isSocialLogin,
+                    profileImg: result.profileImg,
                 },
                 token: token
             });

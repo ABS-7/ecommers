@@ -48,7 +48,8 @@ const users = new mongoose.Schema({
         }]
     },
     profileImg: {
-        type: String
+        type: String,
+        default: ""
     }
 }, { collection: "Users" });
 
