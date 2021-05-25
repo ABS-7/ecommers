@@ -252,13 +252,13 @@ async function editPassword(req, res) {
 async function setUserImg(req, res) {
     try {
         let userProducts;
-        const fullPath = path.join(process.cwd(), req.file.path);
+        const temp = req.file.path.split('\\')
+        const fullPath = path.join('localhost:3000', temp[1], temp[2]);
         const updatedUserResult = await userModel.updateOne({ _id: req.user._id }, { profileImg: fullPath });
 
         if (updatedUserResult.ok === 1 && updatedUserResult.nModified === 1) {
             if (req.user.userType === 'vendor') {
                 userProducts = await productModel.find({ addedBy: req.user._id });
-                console.log(userProducts);
             } else { userProducts = []; }
             return res.status(200).json({
                 user: {
